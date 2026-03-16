@@ -1,0 +1,60 @@
+name: Build FNF
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # You can also use windows-latest if needed
+
+    steps:
+    - name: Checkout repository
+      uses: [actions/checkout@v4](https://github.com)
+
+    - name: Setup Haxe and HaxeFlixel
+      # You would typically use a custom action or script here to install specific Haxe/Hashlink versions and libraries
+      # e.g., run a shell script to automate dependency installation (like install-dependencies.sh)
+      run: |
+        # Example commands (these will vary based on your engine's specific needs)
+        sudo apt-get update
+        sudo apt-get install git
+        # Instructions for Haxe and Hashlink installation would go here
+        # Example using a setup script from the repo if available:
+        # ./dependency-install.bat # (for Windows runners)
+        # or custom shell commands for Linux
+
+    - name: Install Haxe libraries
+      run: |
+        haxelib setup ~/haxelib
+        haxelib install hxcpp
+        haxelib install lime 7.9.0
+        haxelib install openfl
+        haxelib install flixel
+        haxelib run lime setup
+        haxelib run lime setup flixel
+        haxelib install flixel-tools
+        haxelib run flixel-tools setup
+        haxelib install flixel-addons
+        haxelib install flixel-ui
+        haxelib install hscript
+        haxelib install polymod
+        haxelib install hxcpp-debug-server
+        haxelib list
+    - name: Build FNF project
+      run: |
+        # Run the build command for a specific target (e.g., windows, linux, html5)
+        # The exact command depends on the engine (e.g. `lime build windows` or `haxelib run lime build windows`)
+        lime build windows
+
+    - name: Upload Artifacts
+      uses: [actions/upload-artifact@v4](https://github.com)
+      with:
+        name: FNF-SEOS-Build-Windows
+        path: export/windows/bin  # The path where the compiled game is located
