@@ -1,0 +1,43 @@
+name: FNF Game Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Use a Linux runner for faster builds and easy setup
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4 # Action to check out your code
+
+    - name: Setup Haxe environment
+      # A custom action is generally needed to install specific Haxe versions and libraries
+      # A generic setup might look like this, but a dedicated FNF action or script is better
+      run: |
+        curl -L https://lib.haxe.org | tar xz
+        export HAXE_HOME=$PWD/haxe
+        export PATH=$HAXE_HOME:$PATH
+        haxe setup # You will need to replace this with the specific commands to set up HaxeFlixel/Lime
+
+    - name: Install FNF dependencies
+      # The commands to install necessary haxelibs for the specific engine
+      run: |
+        haxelib setup /usr/local/lib/haxelib
+        haxelib install lime
+        haxelib install openfl
+        # ... install other specific libraries as required by your FNF source code (e.g., flixel, psych-engine, etc)
+
+    - name: Build the game
+      run: |
+        # Navigate to the source code directory if necessary and run the build command
+        lime build windows # Replace 'windows' with your desired target (linux, html5, mac, etc)
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: FNF-Build-Windows
+        path: export/windows/bin # The path where your compiled game is located
+
